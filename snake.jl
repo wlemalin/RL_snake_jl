@@ -10,6 +10,12 @@ const PADDING = 3
 const GRID_SIZE = 10 + 2* PADDING # 10x10 playable area + 2 walls on each side
 const VIEW_RANGE = 2
 
+
+# Q-learning parameters
+const EPSILON = 0.0000003  # Exploration rate
+const ALPHA = 0.04   # Learning rate
+const GAMMA = 0.825   # Discount factor
+
 # Define a struct for game state
 struct GameState
     vision::Matrix{Int}  # The 5x5 grid around the snake's head
@@ -114,20 +120,10 @@ function init_game()
     return world, head_pos, body_positions, apple_pos
 end
 #
-# # Test the setup
-# world, head_pos, body_positions, apple_pos = init_game()
-# println("Initial world state:")
-# print_world(world)
 #
-# game_state = get_state(world, head_pos, apple_pos, body_positions)
-# println("\nEnhanced game state:")
-# println("Vision matrix:")
-# for row in eachrow(game_state.vision)
-#     println(join(row, " "))
-# end
-# println("Relative apple position: ", game_state.apple_relative_pos)
-# println("Snake length: ", game_state.length)
-#
+
+
+
 # Add these constants for actions
 const UP = 1
 const RIGHT = 2
@@ -137,13 +133,13 @@ const LEFT = 4
 # Get direction vector from action
 function action_to_direction(action)
     if action == UP
-        return (-1, 0)
-    elseif action == RIGHT
         return (0, 1)
-    elseif action == DOWN
+    elseif action == RIGHT
         return (1, 0)
-    else  # LEFT
+    elseif action == DOWN
         return (0, -1)
+    else  # LEFT
+        return (-1, 0)
     end
 end
 
@@ -155,7 +151,7 @@ function step!(world, head_pos, body_positions, apple_pos, action)
     # Check collision with wall or body
     if world[new_head[1], new_head[2]] == WALL || 
        world[new_head[1], new_head[2]] == SNAKE_BODY
-        return true, 0, apple_pos  # Game over
+        return true, -1, apple_pos  # Game over
     end
     
     # Check if apple is eaten
@@ -190,7 +186,7 @@ function random_action()
 end
 
 # Main game loop for testing
-function play_game!(world, head_pos, body_positions, apple_pos; max_steps=100)
+function play_game!(world, head_pos, body_positions, apple_pos; max_steps=200)
     total_score = 0
     
     for step in 1:max_steps
@@ -215,19 +211,236 @@ function play_game!(world, head_pos, body_positions, apple_pos; max_steps=100)
             break
         end
         
-        sleep(0.5)  # Slow down for visibility
+        sleep(0.3)  # Slow down for visibility
     end
     return total_score
 end
 
-# Test the game
-function test_game()
+
+
+using Statistics
+
+
+# Helper function to convert GameState to a string key for our Q-table
+function state_to_key(state::GameState)
+    # Flatten vision matrix to string and combine with apple position
+    vision_str = join(state.vision)
+    return "$(vision_str)|$(state.apple_relative_pos)"
+end
+
+# Initialize Q-table
+function init_q_table()
+    return Dict{String, Vector{Float64}}()
+end
+
+# Get Q-values for a state
+function get_q_values(q_table::Dict{String, Vector{Float64}}, state::GameState)
+    key = state_to_key(state)
+    if !haskey(q_table, key)
+        q_table[key] = zeros(4)
+    end
+    return q_table[key]
+end
+
+# Choose action using epsilon-greedy policy
+function choose_action(q_table::Dict{String, Vector{Float64}}, state::GameState)
+    if rand() < EPSILON
+        return random_action()
+    else
+        q_values = get_q_values(q_table, state)
+        return argmax(q_values)
+    end
+end
+
+# Update Q-table
+function update_q_table!(q_table::Dict{String, Vector{Float64}}, 
+                        state::GameState, action::Int, 
+                        reward::Any, next_state::GameState)
+    current_key = state_to_key(state)
+    next_key = state_to_key(next_state)
+    
+    if !haskey(q_table, current_key)
+        q_table[current_key] = zeros(4)
+    end
+    if !haskey(q_table, next_key)
+        q_table[next_key] = zeros(4)
+    end
+    
+    current_q = q_table[current_key][action]
+    next_max_q = maximum(q_table[next_key])
+    
+    q_table[current_key][action] = current_q + 
+                                   ALPHA * (reward + GAMMA * next_max_q - current_q)
+end
+
+# Training function
+using Serialization
+
+# File path for saving Q-table
+const Q_TABLE_FILE = "snake_q_table.jls"
+
+# Function to save Q-table
+function save_q_table(q_table::Dict{String, Vector{Float64}})
+    open(Q_TABLE_FILE, "w") do io
+        serialize(io, q_table)
+    end
+    println("Q-table saved to $Q_TABLE_FILE")
+end
+
+# Function to load Q-table
+function load_q_table()
+    if isfile(Q_TABLE_FILE)
+        q_table = open(deserialize, Q_TABLE_FILE)
+        println("Loaded existing Q-table from $Q_TABLE_FILE")
+        return q_table
+    else
+        println("No existing Q-table found. Starting fresh.")
+        return init_q_table()
+    end
+end
+
+# Modify train_q_learning to use existing Q-table
+function train_q_learning(episodes::Int; max_steps=200)
+    q_table = load_q_table()
+    episode_rewards = zeros(episodes)
+    episode_lengths = zeros(Int, episodes)
+    
+    for episode in 1:episodes
+        world, head_pos, body_positions, apple_pos = init_game()
+        total_reward = 0
+        steps = 0
+        
+        for step in 1:max_steps
+            current_state = get_state(world, head_pos, apple_pos, body_positions)
+            action = choose_action(q_table, current_state)
+            
+            game_over, reward, new_apple_pos = step!(world, head_pos, 
+                                                     body_positions, apple_pos, action)
+            apple_pos = new_apple_pos
+            
+            next_state = get_state(world, head_pos, apple_pos, body_positions)
+            
+            q_reward = reward
+            if game_over
+                q_reward = -1.0
+            end
+            
+            update_q_table!(q_table, current_state, action, q_reward, next_state)
+            
+            total_reward += reward
+            steps += 1
+            
+            if game_over
+                break
+            end
+        end
+        
+        episode_rewards[episode] = total_reward
+        episode_lengths[episode] = steps
+        
+        if episode % 50000 == 0
+            println("Episode $episode: Reward = $total_reward, Steps = $steps")
+            # Save periodically during training
+            save_q_table(q_table)
+        end
+    end
+    
+    # Save final Q-table
+    save_q_table(q_table)
+    
+    return q_table, episode_rewards, episode_lengths
+end
+# Modify play_game! to use Q-learning
+function play_trained_game!(q_table::Dict{String, Vector{Float64}}, 
+                           world, head_pos, body_positions, apple_pos; 
+                           max_steps=1000)
+    total_score = 0
+    
+    for step in 1:max_steps
+        state = get_state(world, head_pos, apple_pos, body_positions)
+        action = choose_action(q_table, state)
+        
+        game_over, score, new_apple_pos = step!(world, head_pos, 
+                                                body_positions, apple_pos, action)
+        apple_pos = new_apple_pos
+        total_score += score
+        
+        println("\nStep $step, Action: $action")
+        print_world(world)
+        println("Score: $total_score")
+        
+        if game_over
+            println("Game Over! Final score: $total_score")
+            break
+        end
+        
+        sleep(0.3)
+    end
+    return total_score
+end
+
+# Training and visualization function
+function train_and_visualize(episodes::Int)
+    println("Starting training...")
+    q_table, rewards, lengths = train_q_learning(episodes)
+    
+    println("\nTraining completed!")
+    println("Average reward last 100 episodes: ", 
+            mean(rewards[max(1, end-99):end]))
+    println("Average length last 100 episodes: ", 
+            mean(lengths[max(1, end-99):end]))
+    
+    println("\nPlaying a game with trained policy...")
     world, head_pos, body_positions, apple_pos = init_game()
     println("Initial state:")
     print_world(world)
     println("\nStarting game...")
-    return play_game!(world, head_pos, body_positions, apple_pos)
+    play_trained_game!(q_table, world, head_pos, body_positions, apple_pos)
+    
+    return q_table, rewards, lengths
 end
 
-# Run the test
-test_game()
+function main(; episodes=1000, train=true)
+    if train
+        println("Starting/Continuing training...")
+        q_table, rewards, lengths = train_q_learning(episodes)
+    else
+        println("Loading existing Q-table for play...")
+        q_table = load_q_table()
+        rewards = []
+        lengths = []
+    end
+    
+    println("\nPlaying a game with current policy...")
+    world, head_pos, body_positions, apple_pos = init_game()
+    println("Initial state:")
+    print_world(world)
+    println("\nStarting game...")
+    play_trained_game!(q_table, world, head_pos, body_positions, apple_pos)
+    
+    return q_table, rewards, lengths
+end
+
+# Add command line argument handling
+function parse_arguments()
+    if length(ARGS) > 0
+        if ARGS[1] == "train"
+            episodes = length(ARGS) > 1 ? parse(Int, ARGS[2]) : 1000
+            return true, episodes
+        elseif ARGS[1] == "play"
+            return false, 0
+        end
+    end
+    return true, 1000  # default behavior
+end
+
+# Run the program
+function run_program()
+    train, episodes = parse_arguments()
+    q_table, rewards, lengths = main(episodes=episodes, train=train)
+    return q_table, rewards, lengths
+end
+
+# Execute
+q_table, rewards, lengths = run_program()
+println(rewards, lengths)
