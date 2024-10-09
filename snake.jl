@@ -2,11 +2,13 @@ include("LearningModule.jl")
 include("InitialiseModule.jl")
 include("Constantes.jl")
 include("PlayModule.jl")
+include("CommandModule.jl")
 
 using .LearningModule
 using .InitialiseModule
 using ..InitialiseModule: GameState
 using .Constantes
+using .CommandModule
 using .PlayModule
 using Random
 using Statistics
@@ -107,18 +109,6 @@ function main(; episodes=1000, train=true)
     return q_table, rewards, lengths
 end
 
-# Add command line argument handling
-function parse_arguments()
-    if length(ARGS) > 0
-        if ARGS[1] == "train"
-            episodes = length(ARGS) > 1 ? parse(Int, ARGS[2]) : 1000
-            return true, episodes
-        elseif ARGS[1] == "play"
-            return false, 0
-        end
-    end
-    return true, 1000  # default behavior
-end
 
 # Run the program
 function run_program()
