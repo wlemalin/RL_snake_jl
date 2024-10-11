@@ -58,6 +58,7 @@ function step!(world, head_pos, body_positions, apple_pos, action)
     
     return false, score, apple_pos
 end
+
 # Choose action using epsilon-greedy policy
 function choose_action(q_table::Dict{String, Vector{Float64}}, state::GameState)
     if rand() < EPSILON
