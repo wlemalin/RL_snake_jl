@@ -13,11 +13,7 @@ using .PlayModule
 using Random
 using Statistics
 
-function update!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, current_key::String, action::Int8, q_update::Float64)
-
-    if !haskey(q_table, current_key)
-    q_table[current_key] = (zeros(Float64, 4), zeros(Int, 4))  
-    end
+function update!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, current_key::String, action::Int, q_update::Float64)
 
     q_table[current_key][1][action] = q_update
     q_table[current_key][2][action] += 1
@@ -28,6 +24,11 @@ function egreedy_bandit(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}
     state::GameState)   
 
     current_key = state_to_key(state)
+
+    if !haskey(q_table, current_key)
+    q_table[current_key] = (zeros(Float64, 4), zeros(Int, 4))  
+    end
+
     action = choose_action(q_table, state)
     current_q = q_table[current_key][1][action] 
 
@@ -43,7 +44,12 @@ function upperbound(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}},
     state::GameState)
 
     current_key = state_to_key(state)
-    action = argmax(q_table[current_key][1] .+ ALPHA * sqrt(log(q_table[current_key][2]) / q_table[current_key][2]))
+
+    if !haskey(q_table, current_key)
+    q_table[current_key] = (zeros(Float64, 4), zeros(Int, 4))  
+    end
+
+   action = argmax(q_table[current_key][1] .+ ALPHA * sqrt.(log.(q_table[current_key][2] .+ 1) ./ (q_table[current_key][2] .+ 1)))
     current_q = q_table[current_key][1][action] 
     
     q_update! = (reward) -> begin 
