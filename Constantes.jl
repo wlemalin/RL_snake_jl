@@ -4,7 +4,7 @@ export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANG
 export UP, RIGHT, DOWN, LEFT
 
 # Q-learning parameters
-const EPSILON = 0.0000003  # Exploration rate
+const EPSILON = 0.03  # Exploration rate
 const ALPHA = 0.04   # Learning rate
 const GAMMA = 0.825   # Discount factor
 
