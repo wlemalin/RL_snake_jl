@@ -10,7 +10,7 @@ const Q_TABLE_FILE = "snake_q_table.jls"
 
 # Function to save Q-table
 function save_q_table(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}) 
-    open(Q_TABLE_FILE, "a+") do io
+    open(Q_TABLE_FILE, "w") do io
         serialize(io, q_table)
     end
     println("Q-table saved to $Q_TABLE_FILE")

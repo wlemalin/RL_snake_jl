@@ -55,7 +55,7 @@ function upperbound(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}},
 end
 
 
-function train_q_learning(episodes::Int; max_steps=1000, algorithm::Function=egreedy_bandit)
+function train_q_learning(episodes::Int; max_steps=1000, algorithm::Function=upperbound)
     q_table = load_q_table()
     episode_rewards = zeros(episodes)
     episode_lengths = zeros(Int, episodes)
