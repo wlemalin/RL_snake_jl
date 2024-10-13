@@ -19,7 +19,7 @@ function action_to_direction(action)
         return (1, 0)
     elseif action == DOWN
         return (0, -1)
-    else  # LEFT
+    else  
         return (-1, 0)
     end
 end
@@ -66,7 +66,7 @@ function step!(world, head_pos, body_positions, apple_pos, action)
     
     if world[new_head[1], new_head[2]] == WALL || 
        world[new_head[1], new_head[2]] == SNAKE_BODY
-        return true, -1, apple_pos  # Game over
+        return true, -1, apple_pos  
     end
 
     apple_eaten = (new_head[1], new_head[2]) == apple_pos
@@ -106,7 +106,7 @@ Args:
 Returns:
     action (Int): The index of the chosen action, either randomly chosen or based on the highest Q-value.
 """
-function choose_action(q_table::Dict{String, Vector{Float64}}, state::GameState)
+function choose_action(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, state::GameState)
     if rand() < EPSILON
         return random_action()
     else
@@ -186,12 +186,12 @@ Args:
 Returns:
     q_values (Vector{Float64}): A vector of Q-values for the four possible actions.
 """
-function get_q_values(q_table::Dict{String, Vector{Float64}}, state::GameState)
+function get_q_values(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, state::GameState)
     key = state_to_key(state)
     if !haskey(q_table, key)
-        q_table[key] = zeros(4)
+        q_table[key][1] = zeros(4)
     end
-    return q_table[key]
+    return q_table[key][1]
 end
 
 # Pretty print the world
@@ -242,7 +242,7 @@ Args:
 Returns:
     total_score (Int): The total score obtained by the snake in this game.
 """
-function play_trained_game!(q_table::Dict{String, Vector{Float64}}, 
+function play_trained_game!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, 
                            world, head_pos, body_positions, apple_pos; 
                            max_steps=1000)
     total_score = 0

@@ -13,62 +13,49 @@ using .PlayModule
 using Random
 using Statistics
 
+function update!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, current_key::String, action::Int8, q_update::Float64)
 
-# Update Q-table
-"""
-Update the Q-table using the Q-learning update rule.
-
-This function updates the Q-value for the given state-action pair based on the reward received 
-and the maximum Q-value of the next state. It uses the Q-learning formula to compute the update.
-
-Args:
-    q_table (Dict{String, Vector{Float64}}): The Q-table mapping state keys to Q-value vectors.
-    state (GameState): The current game state.
-    action (Int): The index of the action that was taken.
-    reward (Any): The reward received after taking the action.
-    next_state (GameState): The game state after the action has been performed.
-
-The function modifies the Q-table in place, updating the Q-value for the (state, action) pair.
-"""
-function update_q_table!(q_table::Dict{String, Vector{Float64}}, 
-                        state::GameState, action::Int, 
-                        reward::Any, next_state::GameState)
-    current_key = state_to_key(state)
-    next_key = state_to_key(next_state)
-    
     if !haskey(q_table, current_key)
-        q_table[current_key] = zeros(4)
+    q_table[current_key] = (zeros(Float64, 4), zeros(Int, 4))  
     end
-    if !haskey(q_table, next_key)
-        q_table[next_key] = zeros(4)
+
+    q_table[current_key][1][action] = q_update
+    q_table[current_key][2][action] += 1
+
+end 
+
+function egreedy_bandit(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, 
+    state::GameState)   
+
+    current_key = state_to_key(state)
+    action = choose_action(q_table, state)
+    current_q = q_table[current_key][1][action] 
+
+    q_update! = (reward) -> begin 
+        q_update_value = current_q + ALPHA * (reward - current_q)  
+        update!(q_table, current_key, action, q_update_value)        
     end
+
+    return action, q_update!
+end
+
+function upperbound(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, 
+    state::GameState)
+
+    current_key = state_to_key(state)
+    action = argmax(q_table[current_key][1] .+ ALPHA * sqrt(log(q_table[current_key][2]) / q_table[current_key][2]))
+    current_q = q_table[current_key][1][action] 
     
-    current_q = q_table[current_key][action]
-    next_max_q = maximum(q_table[next_key])
-    
-    q_table[current_key][action] = current_q + 
-                                   ALPHA * (reward + GAMMA * next_max_q - current_q)
+    q_update! = (reward) -> begin 
+        q_update_value = current_q + ALPHA * (reward - current_q)  
+        update!(q_table, current_key, action, q_update_value)           
+    end
+
+    return action, q_update!
 end
 
 
-# Modify train_q_learning to use existing Q-table
-"""
-Train the agent using Q-learning for a given number of episodes.
-
-This function runs a series of episodes to train the Q-learning agent. It uses the epsilon-greedy policy 
-to choose actions and updates the Q-table after each step. The Q-table is saved periodically and after 
-training is complete.
-
-Args:
-    episodes (Int): The number of episodes to train the agent.
-    max_steps (Int, optional): The maximum number of steps in each episode. Default is 1000.
-
-Returns:
-    q_table (Dict{String, Vector{Float64}}): The updated Q-table after training.
-    episode_rewards (Vector{Float64}): A vector containing the total reward obtained in each episode.
-    episode_lengths (Vector{Int}): A vector containing the number of steps taken in each episode.
-"""
-function train_q_learning(episodes::Int; max_steps=1000)
+function train_q_learning(episodes::Int; max_steps=1000, algorithm::Function=egreedy_bandit)
     q_table = load_q_table()
     episode_rewards = zeros(episodes)
     episode_lengths = zeros(Int, episodes)
@@ -80,20 +67,18 @@ function train_q_learning(episodes::Int; max_steps=1000)
         
         for step in 1:max_steps
             current_state = get_state(world, head_pos, apple_pos, body_positions)
-            action = choose_action(q_table, current_state)
+            action, q_update! = algorithm(q_table, current_state)
             
             game_over, reward, new_apple_pos = step!(world, head_pos, 
                                                      body_positions, apple_pos, action)
             apple_pos = new_apple_pos
-            
-            next_state = get_state(world, head_pos, apple_pos, body_positions)
             
             q_reward = reward
             if game_over
                 q_reward = -1.0
             end
             
-            update_q_table!(q_table, current_state, action, q_reward, next_state)
+            q_update!(q_reward)
             
             total_reward += reward
             steps += 1

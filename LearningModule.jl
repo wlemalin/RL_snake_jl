@@ -1,6 +1,6 @@
 module LearningModule
 
-export init_q_table, load_q_table, save_q_table
+export load_q_table, save_q_table
   
 # Training function
 using Serialization
@@ -8,14 +8,9 @@ using Serialization
 # File path for saving Q-table
 const Q_TABLE_FILE = "snake_q_table.jls"
 
-# Initialize Q-table
-function init_q_table()
-    return Dict{String, Vector{Float64}}()
-end
-
 # Function to save Q-table
-function save_q_table(q_table::Dict{String, Vector{Float64}})
-    open(Q_TABLE_FILE, "w") do io
+function save_q_table(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}) 
+    open(Q_TABLE_FILE, "a+") do io
         serialize(io, q_table)
     end
     println("Q-table saved to $Q_TABLE_FILE")
@@ -29,7 +24,7 @@ function load_q_table()
         return q_table
     else
         println("No existing Q-table found. Starting fresh.")
-        return init_q_table()
+        return Dict{String, Tuple{Vector{Float64}, Vector{Int}}}()
     end
 end
 
