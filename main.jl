@@ -11,6 +11,7 @@ function main(; episodes=1000, train=true)
     else
         println("Loading existing Q-table for play...")
         q_table = load_q_table()
+        play_trained_game!(q_table)
         rewards = []
         lengths = []
     end

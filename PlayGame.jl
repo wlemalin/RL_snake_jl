@@ -6,7 +6,7 @@ include("HyperParameters.jl")
 using .HyperParameters
 using ..InitGame
 
-export action_to_direction, step!, print_world, state_to_key, get_q_values, check_haskey!
+export action_to_direction, step!, print_world, state_to_key, get_q_values, check_haskey!, play_trained_game!
 
 function action_to_direction(action)
     if action == UP
@@ -88,6 +88,33 @@ function print_world(game::StateGame)
         end
         println()
     end
+end
+
+function play_trained_game!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}; max_steps=1000)
+    game = init_game()
+    total_score = 0
+
+    for step in 1:max_steps
+        current_key = state_to_key(game)
+        check_haskey!(q_table, current_key)
+        action = argmax(q_table[current_key][1])
+
+        game_over, score, ___ = step!(game, action)
+        total_score += score
+
+        println("\nStep $step, Action: $action")
+        print_world(world)
+        println("Score: $total_score")
+
+        if game_over
+            println("Game Over! Final score: $total_score")
+            break
+        end
+
+        sleep(0.3)
+    end
+
+    return total_score
 end
 
 end
