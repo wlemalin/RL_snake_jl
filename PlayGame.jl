@@ -57,7 +57,8 @@ export state_to_key, get_q_values
 
 function state_to_key(game::StateGame)
     vision_str = join(game.vision)
-    return "$(vision_str)|$(Tuple(game.apple_relative_pos))"
+    body_str = join(game.body_relative_pos)
+    return "$(vision_str)|$(Tuple(game.apple_relative_pos))|$(body_str)"
 end
 
 function check_haskey!(q_table, current_key)

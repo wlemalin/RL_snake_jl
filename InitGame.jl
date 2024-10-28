@@ -15,6 +15,7 @@ mutable struct StateGame
     length::Int
     head_pos::CartesianIndex
     body_positions::Vector{CartesianIndex}
+    body_relative_pos::Vector{CartesianIndex}
     world::Matrix{Int}
 
     function StateGame(world::Matrix{Int})
@@ -25,8 +26,9 @@ mutable struct StateGame
         apple_relative_pos = CartesianIndex(apple_pos[1] - head_pos[1], apple_pos[2] - head_pos[2])
         vision = zeros(Int, 2*VIEW_RANGE+1, 2*VIEW_RANGE+1)
         body_positions = reverse(collect(findall(x -> x == SNAKE_BODY, world)))
+        body_relative_pos = [CartesianIndex(body[1] - head_pos[1], body[2] - head_pos[2]) for body in body_positions]
 
-        new(vision, apple_pos, apple_relative_pos, length, head_pos, body_positions, world)
+        new(vision, apple_pos, apple_relative_pos, length, head_pos, body_positions, body_relative_pos, world)
 
     end
 
@@ -85,6 +87,7 @@ function update_state!(game::StateGame)
     game.apple_pos = findfirst(x -> x == APPLE, game.world)
     game.apple_relative_pos = CartesianIndex(game.apple_pos[1] - game.head_pos[1], 
                                             game.apple_pos[2] - game.head_pos[2])
+    game.body_relative_pos = [CartesianIndex(body[1] - game.head_pos[1], body[2] - game.head_pos[2]) for body in game.body_positions]
     update_vision!(game)
     
 end
