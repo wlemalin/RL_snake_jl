@@ -68,7 +68,7 @@ export state_to_key, get_q_values
 function state_to_key(game::StateGame)
     vision_str = join(game.vision)
     body_str = join(game.body_relative_pos)
-    return "$(vision_str)|$(Tuple(game.apple_relative_pos))" #|$(body_str)
+    return "$(vision_str)|$(Tuple(game.apple_relative_pos))|$(body_str)" #|$(body_str)
 end
 
 function check_haskey!(q_table, current_key)
@@ -108,7 +108,7 @@ function print_world(game::StateGame)
     end
 end
 
-function play_trained_game!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}; max_steps=1000)
+function play_trained_game!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}; max_steps=200)
     game = init_game()
     total_score = 0
 

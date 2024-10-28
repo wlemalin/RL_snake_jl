@@ -29,7 +29,7 @@ export update_q_table!, egreedy, train_q_learning
 export save_q_table, load_q_table
 
 function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, 
-    current_key, action::Int, reward::Any, next_key)
+    current_key, action::Int, reward::Any, next_key, alpha::Bool)
 
     check_haskey!(q_table, current_key)
     check_haskey!(q_table, next_key)
@@ -37,7 +37,12 @@ function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int
     current_q = q_table[current_key][1][action]
     next_max_q = maximum(q_table[next_key][1])
 
-    q_table[current_key][1][action] = current_q + ALPHA * (reward + GAMMA * next_max_q - current_q)
+    if alpha == true
+        q_table[current_key][1][action] = current_q + ALPHA * (reward + GAMMA * next_max_q - current_q)
+    elseif alpha == false
+        q_table[current_key][1][action] = current_q + (1 / (q_table[current_key][2][action] + 1)) * (reward + GAMMA * next_max_q - current_q)
+    end
+
     q_table[current_key][2][action] += 1
 end
 
@@ -58,11 +63,10 @@ function upper_confident_bound(q_table::Dict{String, Tuple{Vector{Float64}, Vect
     return action 
 end
 
-function train_q_learning(episodes::Int; max_steps=1000)
+function train_q_learning(episodes::Int; max_steps=300)
     q_table = load_q_table()
     episode_rewards = zeros(episodes)
     episode_lengths = zeros(Int, episodes)
-    episode_snake = zeros(Int, episodes)
 
     for episode in 1:episodes
         game = init_game()
@@ -85,7 +89,7 @@ function train_q_learning(episodes::Int; max_steps=1000)
                 q_reward = HURDLE
             end
 
-            update_q_table!(q_table, current_key, action, q_reward, next_key)
+            update_q_table!(q_table, current_key, action, q_reward, next_key, false)
 
             total_reward += reward
             steps += 1
@@ -98,7 +102,6 @@ function train_q_learning(episodes::Int; max_steps=1000)
 
         episode_rewards[episode] = total_reward
         episode_lengths[episode] = steps
-        episode_snake[episode] = game.length
 
         if episode % 50000 == 0
             println("Episode $episode: Reward = $total_reward, Steps = $steps")
