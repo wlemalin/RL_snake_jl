@@ -1,7 +1,5 @@
-include("Qtable.jl")
 include("TrainSnake.jl")
 
-using .Qtable
 using .TrainSnake
 
 function main(; episodes=1000, train=true)

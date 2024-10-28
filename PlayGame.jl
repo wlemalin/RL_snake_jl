@@ -1,11 +1,19 @@
 module PlayGame
 
-include("HyperParameters.jl")
-# include("InitGame.jl")
+include("InitGame.jl")
 
-using .HyperParameters
-using ..InitGame
+using .InitGame
 
+#Exports from HyperParameters.jl
+export EPSILON, ALPHA, GAMMA
+export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
+export UP, RIGHT, DOWN, LEFT
+
+#Exports from InitGame
+export init_world, init_snake, place_snake!, place_apple!
+export update_vision!, update_state!, init_game, StateGame
+
+#Exports from PlayGame
 export action_to_direction, step!, print_world, state_to_key, get_q_values, check_haskey!, play_trained_game!
 
 function action_to_direction(action)
@@ -104,7 +112,7 @@ function play_trained_game!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{
         total_score += score
 
         println("\nStep $step, Action: $action")
-        print_world(world)
+        print_world(game)
         println("Score: $total_score")
 
         if game_over

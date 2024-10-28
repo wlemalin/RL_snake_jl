@@ -4,6 +4,12 @@ include("HyperParameters.jl")
 
 using .HyperParameters
 
+#Exports from HyperParameters.jl
+export EPSILON, ALPHA, GAMMA
+export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
+export UP, RIGHT, DOWN, LEFT
+
+#Exports from InitGame
 export init_world, init_snake, place_snake!, place_apple!
 export update_vision!, update_state!, init_game, StateGame
 

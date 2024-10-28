@@ -1,19 +1,31 @@
 module TrainSnake
 
-include("HyperParameters.jl")
-include("InitGame.jl")
-#include("PlayGame.jl")
-#include("Qtable.jl")
+include("Qtable.jl")
+include("PlayGame.jl")
 
-using .HyperParameters
-using .InitGame
-using ..PlayGame
-using ..Qtable
+using .PlayGame
+using .Qtable
 
 using Random
 using Statistics
 
+#Exports from HyperParameters.jl
+export EPSILON, ALPHA, GAMMA
+export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
+export UP, RIGHT, DOWN, LEFT
+
+#Exports from InitGame
+export init_world, init_snake, place_snake!, place_apple!
+export update_vision!, update_state!, init_game, StateGame
+
+#Exports from PlayGame
+export action_to_direction, step!, print_world, state_to_key, get_q_values, check_haskey!, play_trained_game!
+
+#Exports from TrainSnake
 export update_q_table!, egreedy, train_q_learning
+
+#Exports from Qtable
+export save_q_table, load_q_table
 
 function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, 
     current_key, action::Int, reward::Any, next_key)
