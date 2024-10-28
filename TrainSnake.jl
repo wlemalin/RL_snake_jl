@@ -2,13 +2,13 @@ module TrainSnake
 
 include("HyperParameters.jl")
 include("InitGame.jl")
-include("PlayGame.jl")
-include("Qtable.jl")
+#include("PlayGame.jl")
+#include("Qtable.jl")
 
 using .HyperParameters
 using .InitGame
-using .PlayGame
-using .Qtable
+using ..PlayGame
+using ..Qtable
 
 using Random
 using Statistics
