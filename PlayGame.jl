@@ -3,11 +3,13 @@ module PlayGame
 include("InitGame.jl")
 
 using .InitGame
+using  Random
 
 #Exports from HyperParameters.jl
 export EPSILON, ALPHA, GAMMA
 export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
 export UP, RIGHT, DOWN, LEFT
+export APPLE_EATEN, VACANT, HURDLE
 
 #Exports from InitGame
 export init_world, init_snake, place_snake!, place_apple!
@@ -34,11 +36,11 @@ function step!(game::StateGame, action)
     new_head = game.head_pos + movement
     
     if game.world[new_head] == WALL || game.world[new_head] == SNAKE_BODY
-        return true, -1, game.apple_pos  
+        return true, HURDLE, game.apple_pos  
     end
 
     apple_eaten = new_head == game.apple_pos
-    score = apple_eaten ? 1 : 0
+    score = apple_eaten ? APPLE_EATEN : VACANT
     
     game.world[game.head_pos] = SNAKE_BODY
     

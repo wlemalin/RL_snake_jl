@@ -13,6 +13,7 @@ using Statistics
 export EPSILON, ALPHA, GAMMA
 export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
 export UP, RIGHT, DOWN, LEFT
+export APPLE_EATEN, VACANT, HURDLE
 
 #Exports from InitGame
 export init_world, init_snake, place_snake!, place_apple!
@@ -71,7 +72,7 @@ function train_q_learning(episodes::Int; max_steps=1000)
             q_reward = reward
 
             if game_over
-                q_reward = -1.0
+                q_reward = HURDLE
             end
 
             update_q_table!(q_table, current_key, action, q_reward, next_key)

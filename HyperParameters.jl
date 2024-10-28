@@ -3,6 +3,7 @@ module HyperParameters
 export EPSILON, ALPHA, GAMMA
 export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
 export UP, RIGHT, DOWN, LEFT
+export APPLE_EATEN, VACANT, HURDLE
 
 # RL hyperparameters
 const EPSILON = 0.03  
@@ -24,5 +25,10 @@ const UP = 1
 const RIGHT = 2
 const DOWN = 3
 const LEFT = 4
+
+# Rewards 
+const APPLE_EATEN = 1
+const VACANT = 0
+const HURDLE = -1
 
 end
