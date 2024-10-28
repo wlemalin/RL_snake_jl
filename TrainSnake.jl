@@ -20,7 +20,7 @@ export init_world, init_snake, place_snake!, place_apple!
 export update_vision!, update_state!, init_game, StateGame
 
 #Exports from PlayGame
-export action_to_direction, step!, print_world, state_to_key, get_q_values, check_haskey!, play_trained_game!
+export action_to_direction, step!, print_world, state_to_key, get_q_values, check_haskey!, play_trained_game!, get_time
 
 #Exports from TrainSnake
 export update_q_table!, egreedy, train_q_learning
@@ -50,10 +50,19 @@ function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, gam
     end
 end
 
+function upper_confident_bound(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
+    q_values = get_q_values(q_table, game)
+    time_values = get_time(q_table, game)
+    action = argmax(q_values .+ ALPHA * sqrt.(log.(time_values .+ 1) ./ (time_values .+ 1)))
+
+    return action 
+end
+
 function train_q_learning(episodes::Int; max_steps=1000)
     q_table = load_q_table()
     episode_rewards = zeros(episodes)
     episode_lengths = zeros(Int, episodes)
+    episode_snake = zeros(Int, episodes)
 
     for episode in 1:episodes
         game = init_game()
@@ -62,6 +71,7 @@ function train_q_learning(episodes::Int; max_steps=1000)
 
         for step in 1:max_steps
             action = egreedy(q_table, game)
+            #action = upper_confident_bound(q_table, game)
             current_key = state_to_key(game)
 
             game_over, reward, new_apple_pos = step!(game, action)
@@ -88,6 +98,7 @@ function train_q_learning(episodes::Int; max_steps=1000)
 
         episode_rewards[episode] = total_reward
         episode_lengths[episode] = steps
+        episode_snake[episode] = game.length
 
         if episode % 50000 == 0
             println("Episode $episode: Reward = $total_reward, Steps = $steps")

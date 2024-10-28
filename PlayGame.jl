@@ -16,7 +16,7 @@ export init_world, init_snake, place_snake!, place_apple!
 export update_vision!, update_state!, init_game, StateGame
 
 #Exports from PlayGame
-export action_to_direction, step!, print_world, state_to_key, get_q_values, check_haskey!, play_trained_game!
+export action_to_direction, step!, print_world, state_to_key, get_q_values, check_haskey!, play_trained_game!, get_time
 
 function action_to_direction(action)
     if action == UP
@@ -68,7 +68,7 @@ export state_to_key, get_q_values
 function state_to_key(game::StateGame)
     vision_str = join(game.vision)
     body_str = join(game.body_relative_pos)
-    return "$(vision_str)|$(Tuple(game.apple_relative_pos))|$(body_str)"
+    return "$(vision_str)|$(Tuple(game.apple_relative_pos))" #|$(body_str)
 end
 
 function check_haskey!(q_table, current_key)
@@ -82,6 +82,13 @@ function get_q_values(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}
     check_haskey!(q_table, key)
 
     return q_table[key][1]
+end
+
+function get_time(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
+    key = state_to_key(game)
+    check_haskey!(q_table, key)
+
+    return q_table[key][2]
 end
 
 function print_world(game::StateGame)
