@@ -53,7 +53,7 @@ end
 
 function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
     if rand() < EPSILON 
-        return rand(1:4)
+        return rand(0:3)
     else
         q_values, inverse_transform = get_q_values(q_table, game)
         return argmax(q_values)
