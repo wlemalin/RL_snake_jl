@@ -58,12 +58,12 @@ function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, gam
     q_values, inverse_transform = get_q_values(q_table, game)
 
     if rand() < EPSILON 
-        action = rand(0:3)
+        canonical_action = rand(1:4)
     else
-        action = argmax(q_values)
+        canonical_action = argmax(q_values)
     end
 
-    canonical_action = apply_inverse_transform(inverse_transform, action)
+    action = apply_inverse_transform(inverse_transform, canonical_action)
     return action, canonical_action
 end
 
@@ -71,8 +71,8 @@ function upper_confident_bound(q_table::Dict{String, Tuple{Vector{Float64}, Vect
     q_values, inverse_transform = get_q_values(q_table, game)
     time_values = get_time(q_table, game)
     t_sum = sum(time_values)
-    action = argmax(q_values .+ ALPHA * sqrt.(log.(t_sum + 1) ./ (time_values .+ 1)))
-    canonical_action = apply_inverse_transform(inverse_transform, action)
+    canonical_action = argmax(q_values .+ ALPHA * sqrt.(log.(t_sum + 1) ./ (time_values .+ 1)))
+    action = apply_inverse_transform(inverse_transform, canonical_action)
     return action, canonical_action
 end
 
@@ -91,7 +91,7 @@ function train_q_learning(episodes::Int; max_steps=300)
 
         for step in 1:max_steps
             action, canonical_action = egreedy(q_table, game)
-            #action = upper_confident_bound(q_table, game)
+            #action = upper_confident_bound(q_table, game)           
             current_key, ___ = state_to_key(game)
 
             game_over, reward, new_apple_pos = step!(game, action)

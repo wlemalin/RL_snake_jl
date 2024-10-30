@@ -118,7 +118,7 @@ function run_transformations(game_state, indices, apple_pos)
     inverse_transform = inverse_transformations(applied_transformation)
     # Retourner les résultats
 
-    return "$(canonical_mat)|$(canonical_indices)|$(canonical_apple_pos)", inverse_transform
+    return "$(canonical_mat)|$(canonical_apple_pos)", inverse_transform #|$(canonical_indices)
 end
 
 function apply_inverse_transform(inverse_transform::String, direction::Int)
