@@ -22,7 +22,7 @@ export update_vision!, update_state!, init_game, StateGame
 export action_to_direction, step!, print_world, state_to_key, get_q_values, check_haskey!, play_trained_game!, get_time
 
 #Exports from Symmetry
-export run_transformations
+export run_transformations, apply_inverse_transform
 
 function action_to_direction(action)
     if action == UP

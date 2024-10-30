@@ -1,6 +1,6 @@
 module Symmetry
 
-export run_transformations
+export run_transformations, apply_inverse_transform
 
 # Fonction pour effectuer une rotation de 90 degrés dans le sens des aiguilles d'une montre (clockwise)
 function rotate90_clockwise(mat)

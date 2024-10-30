@@ -33,6 +33,9 @@ export save_q_table, load_q_table
 #Exports from TrainDat
 export add_data
 
+#Exports from Symmetry
+export run_transformations, apply_inverse_transform
+
 function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, 
     current_key, action::Int, reward::Any, next_key, alpha::Bool)
 
