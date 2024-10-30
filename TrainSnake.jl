@@ -55,21 +55,25 @@ function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int
 end
 
 function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
+    q_values, inverse_transform = get_q_values(q_table, game)
+
     if rand() < EPSILON 
-        return rand(0:3)
+        action = rand(0:3)
     else
-        q_values, inverse_transform = get_q_values(q_table, game)
-        return argmax(q_values)
+        action = argmax(q_values)
     end
+
+    canonical_action = apply_inverse_transform(inverse_transform, action)
+    return action, canonical_action
 end
 
 function upper_confident_bound(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
-    q_values = get_q_values(q_table, game)
+    q_values, inverse_transform = get_q_values(q_table, game)
     time_values = get_time(q_table, game)
     t_sum = sum(time_values)
     action = argmax(q_values .+ ALPHA * sqrt.(log.(t_sum + 1) ./ (time_values .+ 1)))
-
-    return action 
+    canonical_action = apply_inverse_transform(inverse_transform, action)
+    return action, canonical_action
 end
 
 function train_q_learning(episodes::Int; max_steps=300)
@@ -86,7 +90,7 @@ function train_q_learning(episodes::Int; max_steps=300)
         steps = 0
 
         for step in 1:max_steps
-            action = egreedy(q_table, game)
+            action, canonical_action = egreedy(q_table, game)
             #action = upper_confident_bound(q_table, game)
             current_key, ___ = state_to_key(game)
 
@@ -101,7 +105,7 @@ function train_q_learning(episodes::Int; max_steps=300)
                 q_reward = HURDLE
             end
 
-            update_q_table!(q_table, current_key, action, q_reward, next_key, true)
+            update_q_table!(q_table, current_key, canonical_action, q_reward, next_key, true)
 
             total_reward += reward
             steps += 1

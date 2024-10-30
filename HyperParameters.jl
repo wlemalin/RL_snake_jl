@@ -21,10 +21,10 @@ const GRID_SIZE = 10 + 2* PADDING
 const VIEW_RANGE = 2
 
 # Movements
-const UP = 0
-const RIGHT = 1
-const DOWN = 2
-const LEFT = 3
+const UP = 1
+const RIGHT = 2
+const DOWN = 3
+const LEFT = 4
 
 # Rewards 
 const APPLE_EATEN = 1

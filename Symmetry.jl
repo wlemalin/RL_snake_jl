@@ -121,20 +121,43 @@ function run_transformations(game_state, indices, apple_pos)
     return "$(canonical_mat)|$(canonical_indices)|$(canonical_apple_pos)", inverse_transform
 end
 
-# Exemple d'utilisation de la fonction principale
-game_state = [
-    4 1
-    3 2
-]
-indices = [CartesianIndex(1, 0), CartesianIndex(1, 1)]
-apple_pos = CartesianIndex(3, 4)
-canonical_mat, canonical_indices, canonical_apple_pos, inverse_transform = run_transformations(game_state, indices, apple_pos)
+function apply_inverse_transform(inverse_transform::String, direction::Int)
+    # Extraire la symétrie et la rotation
+    symmetry = filter(isletter, inverse_transform)
+    rotation = parse(Int, filter(isdigit, inverse_transform))
+    
+    # Appliquer la rotation dans le sens horaire
+    direction = mod(direction - 1 + rotation, 4) + 1
+    
+    # Appliquer la symétrie en ajustant la direction
+    if symmetry == "V"
+        # Inversion gauche-droite : gauche <-> droite (1 <-> 3)
+        direction = mod(direction + 1, 4) + 1
+    elseif symmetry == "H"
+        # Inversion haut-bas : haut <-> bas (0 <-> 2)
+        direction = mod(direction + 1, 4) + 1
+    elseif symmetry == "D"
+        # Symétrie selon y = x : (haut <-> droite), (bas <-> gauche)
+        direction = (direction == 1) ? 2 : (direction == 2) ? 1 : (direction == 3) ? 4 : 3
+    end
+    
+    return direction
+end
 
-# Afficher les résultats
-println("Forme canonique de la matrice:")
-println(canonical_mat)
-println("Indices canoniques: $canonical_indices")
-println("Position canonique de la pomme: $canonical_apple_pos")
-println("Transformation inverse: $inverse_transform")
+# # Exemple d'utilisation de la fonction principale
+# game_state = [
+#     4 1
+#     3 2
+# ]
+# indices = [CartesianIndex(1, 0), CartesianIndex(1, 1)]
+# apple_pos = CartesianIndex(3, 4)
+# canonical_mat, canonical_indices, canonical_apple_pos, inverse_transform = run_transformations(game_state, indices, apple_pos)
+
+# # Afficher les résultats
+# println("Forme canonique de la matrice:")
+# println(canonical_mat)
+# println("Indices canoniques: $canonical_indices")
+# println("Position canonique de la pomme: $canonical_apple_pos")
+# println("Transformation inverse: $inverse_transform")
 
 end
