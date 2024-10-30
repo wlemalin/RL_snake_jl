@@ -1,4 +1,7 @@
-#module symmetry
+module Symmetry
+
+export run_transformations
+
 # Fonction pour effectuer une rotation de 90 degrés dans le sens des aiguilles d'une montre (clockwise)
 function rotate90_clockwise(mat)
     return permutedims(mat, (2, 1))[end:-1:1,:]  # Transposer et inverser les lignes
@@ -114,7 +117,8 @@ function run_transformations(game_state, indices, apple_pos)
     # Trouver la transformation inverse
     inverse_transform = inverse_transformations(applied_transformation)
     # Retourner les résultats
-    return canonical_mat, canonical_indices, canonical_apple_pos, inverse_transform
+
+    return "$(canonical_mat)|$(canonical_indices)|$(canonical_apple_pos)", inverse_transform
 end
 
 # Exemple d'utilisation de la fonction principale
@@ -132,3 +136,5 @@ println(canonical_mat)
 println("Indices canoniques: $canonical_indices")
 println("Position canonique de la pomme: $canonical_apple_pos")
 println("Transformation inverse: $inverse_transform")
+
+end

@@ -55,7 +55,7 @@ function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, gam
     if rand() < EPSILON 
         return rand(1:4)
     else
-        q_values = get_q_values(q_table, game)
+        q_values, inverse_transform = get_q_values(q_table, game)
         return argmax(q_values)
     end
 end
@@ -85,12 +85,12 @@ function train_q_learning(episodes::Int; max_steps=300)
         for step in 1:max_steps
             action = egreedy(q_table, game)
             #action = upper_confident_bound(q_table, game)
-            current_key = state_to_key(game)
+            current_key, ___ = state_to_key(game)
 
             game_over, reward, new_apple_pos = step!(game, action)
             apple_pos = new_apple_pos
 
-            next_key = state_to_key(game)
+            next_key, ___ = state_to_key(game)
 
             q_reward = reward
 

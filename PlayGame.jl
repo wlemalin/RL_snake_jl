@@ -1,8 +1,11 @@
 module PlayGame
 
 include("InitGame.jl")
+include("Symmetry.jl")
 
 using .InitGame
+using .Symmetry
+
 using  Random
 
 #Exports from HyperParameters.jl
@@ -17,6 +20,9 @@ export update_vision!, update_state!, init_game, StateGame
 
 #Exports from PlayGame
 export action_to_direction, step!, print_world, state_to_key, get_q_values, check_haskey!, play_trained_game!, get_time
+
+#Exports from Symmetry
+export run_transformations
 
 function action_to_direction(action)
     if action == UP
@@ -64,9 +70,8 @@ function step!(game::StateGame, action)
 end
 
 function state_to_key(game::StateGame)
-    vision_str = join(game.vision)
-    body_str = join(game.body_relative_pos)
-    return "$(vision_str)|$(game.apple_relative_pos)" #|$(body_str)
+    canonical_key, inverse_transform = run_transformations(game.vision, game.body_relative_pos, game.apple_relative_pos)
+    return canonical_key, inverse_transform
 end
 
 function check_haskey!(q_table, current_key)
@@ -76,17 +81,17 @@ function check_haskey!(q_table, current_key)
 end
 
 function get_q_values(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
-    key = state_to_key(game)
+    key, inverse_transform = state_to_key(game)
     check_haskey!(q_table, key)
 
-    return q_table[key][1]
+    return q_table[key][1], inverse_transform
 end
 
 function get_time(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
-    key = state_to_key(game)
+    key, inverse_transform = state_to_key(game)
     check_haskey!(q_table, key)
 
-    return q_table[key][2]
+    return q_table[key][2], inverse_transform
 end
 
 function print_world(game::StateGame)
@@ -111,7 +116,7 @@ function play_trained_game!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{
     total_score = 0
 
     for step in 1:max_steps
-        current_key = state_to_key(game)
+        current_key, ___ = state_to_key(game)
         check_haskey!(q_table, current_key)
         action = argmax(q_table[current_key][1])
 
