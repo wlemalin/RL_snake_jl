@@ -58,7 +58,8 @@ end
 function upper_confident_bound(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
     q_values = get_q_values(q_table, game)
     time_values = get_time(q_table, game)
-    action = argmax(q_values .+ ALPHA * sqrt.(log.(time_values .+ 1) ./ (time_values .+ 1)))
+    t_sum = sum(time_values)
+    action = argmax(q_values .+ ALPHA * sqrt.(log.(t_sum + 1) ./ (time_values .+ 1)))
 
     return action 
 end
@@ -89,7 +90,7 @@ function train_q_learning(episodes::Int; max_steps=300)
                 q_reward = HURDLE
             end
 
-            update_q_table!(q_table, current_key, action, q_reward, next_key, false)
+            update_q_table!(q_table, current_key, action, q_reward, next_key, true)
 
             total_reward += reward
             steps += 1

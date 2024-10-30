@@ -30,7 +30,7 @@ function action_to_direction(action)
     end
 end
 
-function step!(game::StateGame, action)
+function step!(game::StateGame, action) 
     movement = action_to_direction(action)
     
     new_head = game.head_pos + movement
@@ -68,7 +68,7 @@ export state_to_key, get_q_values
 function state_to_key(game::StateGame)
     vision_str = join(game.vision)
     body_str = join(game.body_relative_pos)
-    return "$(vision_str)|$(Tuple(game.apple_relative_pos))|$(body_str)" #|$(body_str)
+    return "$(vision_str)|$(Tuple(game.apple_relative_pos))|$(body_str)"
 end
 
 function check_haskey!(q_table, current_key)
