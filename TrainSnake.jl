@@ -54,8 +54,9 @@ function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int
     q_table[current_key][2][action] += 1
 end
 
-function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
-    q_values, inverse_transform = get_q_values(q_table, game)
+function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, current_key, inverse_transform)
+    check_haskey!(q_table, current_key)
+    q_values = q_table[current_key][1]
 
     if rand() < EPSILON 
         canonical_action = rand(1:4)
@@ -67,14 +68,14 @@ function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, gam
     return action, canonical_action
 end
 
-function upper_confident_bound(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
-    q_values, inverse_transform = get_q_values(q_table, game)
-    time_values = get_time(q_table, game)
-    t_sum = sum(time_values)
-    canonical_action = argmax(q_values .+ ALPHA * sqrt.(log.(t_sum + 1) ./ (time_values .+ 1)))
-    action = apply_inverse_transform(inverse_transform, canonical_action)
-    return action, canonical_action
-end
+# function upper_confident_bound(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
+#     q_values, inverse_transform = get_q_values(q_table, game)
+#     time_values = get_time(q_table, game)
+#     t_sum = sum(time_values)
+#     canonical_action = argmax(q_values .+ ALPHA * sqrt.(log.(t_sum + 1) ./ (time_values .+ 1)))
+#     action = apply_inverse_transform(inverse_transform, canonical_action)
+#     return action, canonical_action
+# end
 
 function train_q_learning(episodes::Int; max_steps=300)
 
@@ -88,16 +89,16 @@ function train_q_learning(episodes::Int; max_steps=300)
         game = init_game()
         total_reward = 0
         steps = 0
+        current_key, inverse_transform = state_to_key(game)
 
         for step in 1:max_steps
-            action, canonical_action = egreedy(q_table, game)
+            action, canonical_action = egreedy(q_table, current_key, inverse_transform)
             #action = upper_confident_bound(q_table, game)           
-            current_key, ___ = state_to_key(game)
-
+            
             game_over, reward, new_apple_pos = step!(game, action)
             apple_pos = new_apple_pos
 
-            next_key, ___ = state_to_key(game)
+            next_key, inverse_transform = state_to_key(game)
 
             q_reward = reward
 
@@ -106,6 +107,8 @@ function train_q_learning(episodes::Int; max_steps=300)
             end
 
             update_q_table!(q_table, current_key, canonical_action, q_reward, next_key, true)
+
+            current_key = next_key
 
             total_reward += reward
             steps += 1

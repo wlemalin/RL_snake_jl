@@ -80,18 +80,14 @@ function check_haskey!(q_table, current_key)
     end
 end
 
+"""
+Function to return q_values and times each action has been choose given the StateGame.
+"""
 function get_q_values(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
     key, inverse_transform = state_to_key(game)
     check_haskey!(q_table, key)
 
-    return q_table[key][1], inverse_transform
-end
-
-function get_time(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)
-    key, inverse_transform = state_to_key(game)
-    check_haskey!(q_table, key)
-
-    return q_table[key][2], inverse_transform
+    return (q_table[key][1], q_table[key][2]), inverse_transform
 end
 
 function print_world(game::StateGame)
