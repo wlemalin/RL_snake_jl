@@ -70,7 +70,12 @@ function upper_confident_bound(q_table::Dict{String, Tuple{Vector{Float64}, Vect
 end
 
 function train_q_learning(episodes::Int; max_steps=300)
+
     q_table = load_q_table()
+    
+    episode_rewards = zeros(episodes)
+    episode_steps = zeros(Int, episodes)
+    episode_lengths = zeros(Int, episodes)
 
     for episode in 1:episodes
         game = init_game()
@@ -104,7 +109,10 @@ function train_q_learning(episodes::Int; max_steps=300)
 
         end
 
-        add_data(game.length, steps, total_reward)#steps, total_reward
+        episode_rewards[episode] = total_reward
+        episode_steps[episode] = steps
+        episode_lengths[episode] = game.length
+        
 
         if episode % 50000 == 0
             println("Episode $episode: Reward = $total_reward, Steps = $steps")
@@ -113,6 +121,7 @@ function train_q_learning(episodes::Int; max_steps=300)
     end
 
     save_q_table(q_table)
+    add_data(episode_lengths, episode_steps, episode_rewards)
     
 end
 
