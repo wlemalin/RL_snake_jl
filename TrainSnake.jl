@@ -1,10 +1,12 @@
 module TrainSnake
 
 include("Qtable.jl")
+include("TrainDat.jl")
 include("PlayGame.jl")
 
 using .PlayGame
 using .Qtable
+using .TrainDat
 
 using Random
 using Statistics
@@ -27,6 +29,9 @@ export update_q_table!, egreedy, train_q_learning
 
 #Exports from Qtable
 export save_q_table, load_q_table
+
+#Exports from TrainDat
+export add_data
 
 function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, 
     current_key, action::Int, reward::Any, next_key, alpha::Bool)
@@ -66,8 +71,6 @@ end
 
 function train_q_learning(episodes::Int; max_steps=300)
     q_table = load_q_table()
-    episode_rewards = zeros(episodes)
-    episode_lengths = zeros(Int, episodes)
 
     for episode in 1:episodes
         game = init_game()
@@ -101,8 +104,7 @@ function train_q_learning(episodes::Int; max_steps=300)
 
         end
 
-        episode_rewards[episode] = total_reward
-        episode_lengths[episode] = steps
+        add_data(game.length, steps, total_reward)#steps, total_reward
 
         if episode % 50000 == 0
             println("Episode $episode: Reward = $total_reward, Steps = $steps")
@@ -111,8 +113,6 @@ function train_q_learning(episodes::Int; max_steps=300)
     end
 
     save_q_table(q_table)
-
-    return q_table, episode_rewards, episode_lengths
     
 end
 

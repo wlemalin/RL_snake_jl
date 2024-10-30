@@ -5,16 +5,12 @@ using .TrainSnake
 function main(; episodes=1000, train=true)
     if train
         println("Starting/Continuing training...")
-        q_table, rewards, lengths = train_q_learning(episodes)
+        train_q_learning(episodes)
     else
         println("Loading existing Q-table for play...")
         q_table = load_q_table()
         play_trained_game!(q_table)
-        rewards = []
-        lengths = []
     end
-
-    return q_table, rewards, lengths
 end
 
 function parse_arguments()
@@ -31,9 +27,8 @@ end
 
 function run_program()
     train, episodes = parse_arguments()
-    q_table, rewards, lengths = main(episodes=episodes, train=train)
-    return q_table, rewards, lengths
+    main(episodes=episodes, train=train)
 end
 
-q_table, rewards, lengths = Main.run_program()
-println(rewards, lengths)
+Main.run_program()
+
