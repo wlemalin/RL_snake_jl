@@ -16,6 +16,7 @@ export EPSILON, ALPHA, GAMMA
 export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
 export UP, RIGHT, DOWN, LEFT
 export APPLE_EATEN, VACANT, HURDLE
+export INVERSE
 
 #Exports from InitGame
 export init_world, init_snake, place_snake!, place_apple!
@@ -34,7 +35,9 @@ export save_q_table, load_q_table
 export add_data
 
 #Exports from Symmetry
-export run_transformations, apply_inverse_transform
+export rotate90_clockwise, diag_symmetry_y_eq_x, rotations, transform_apple_position
+export transform_indices, symmetries, run_transformations, apply_inverse_transform
+export all_transformations_with_indices_and_apple, canonical_form_with_indices_and_apple, inverse_transformations
 
 function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, 
     current_key, action::Int, reward::Any, next_key, alpha::Bool)
@@ -54,7 +57,7 @@ function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int
     q_table[current_key][2][action] += 1
 end
 
-function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, current_key, inverse_transform)
+function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, current_key::String, inverse_transform::String)
     check_haskey!(q_table, current_key)
     q_values = q_table[current_key][1]
 
@@ -64,8 +67,12 @@ function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, cur
         canonical_action = argmax(q_values)
     end
 
-    action = apply_inverse_transform(inverse_transform, canonical_action)
-    return action, canonical_action
+    if INVERSE == true
+        action = apply_inverse_transform(inverse_transform, canonical_action)
+        return action, canonical_action
+    end
+
+    return canonical_action, canonical_action
 end
 
 # function upper_confident_bound(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, game::StateGame)

@@ -4,6 +4,7 @@ export EPSILON, ALPHA, GAMMA
 export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
 export UP, RIGHT, DOWN, LEFT
 export APPLE_EATEN, VACANT, HURDLE
+export INVERSE
 
 # RL hyperparameters
 const EPSILON = 0.03  
@@ -30,5 +31,8 @@ const LEFT = 4
 const APPLE_EATEN = 1
 const VACANT = 0
 const HURDLE = -1
+
+#chepa
+const INVERSE = false
 
 end

@@ -13,6 +13,7 @@ export EPSILON, ALPHA, GAMMA
 export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
 export UP, RIGHT, DOWN, LEFT
 export APPLE_EATEN, VACANT, HURDLE
+export INVERSE
 
 #Exports from InitGame
 export init_world, init_snake, place_snake!, place_apple!
@@ -22,7 +23,9 @@ export update_vision!, update_state!, init_game, StateGame
 export action_to_direction, step!, print_world, state_to_key, get_q_values, check_haskey!, play_trained_game!, get_time
 
 #Exports from Symmetry
-export run_transformations, apply_inverse_transform
+export rotate90_clockwise, diag_symmetry_y_eq_x, rotations, transform_apple_position
+export transform_indices, symmetries, run_transformations, apply_inverse_transform
+export all_transformations_with_indices_and_apple, canonical_form_with_indices_and_apple, inverse_transformations
 
 function action_to_direction(action)
     if action == UP
@@ -70,11 +73,20 @@ function step!(game::StateGame, action)
 end
 
 function state_to_key(game::StateGame)
-    canonical_key, inverse_transform = run_transformations(game.vision, game.body_relative_pos, game.apple_relative_pos)
-    return canonical_key, inverse_transform
+    
+    if INVERSE == true
+        canonical_key, inverse_transform = run_transformations(game.vision, game.body_relative_pos, game.apple_relative_pos)
+        return canonical_key, inverse_transform
+    end
+
+    vision_str = join(game.vision)
+    body_str = join(game.body_relative_pos)
+    key = "$(vision_str)|$(game.apple_relative_pos)"#|$(game.body_relative_pos)
+
+    return key, "bite"
 end
 
-function check_haskey!(q_table, current_key)
+function check_haskey!(q_table, current_key::String)
     if !haskey(q_table, current_key)
         q_table[current_key] = (zeros(Float64, 4), zeros(Int, 4))  
     end

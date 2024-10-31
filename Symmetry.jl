@@ -1,6 +1,13 @@
 module Symmetry
 
-export run_transformations, apply_inverse_transform
+# include("HyperParameters.jl")
+
+# using .HyperParameters
+
+#Exports from Symmetry
+export rotate90_clockwise, diag_symmetry_y_eq_x, rotations, transform_apple_position
+export transform_indices, symmetries, run_transformations, apply_inverse_transform
+export all_transformations_with_indices_and_apple, canonical_form_with_indices_and_apple, inverse_transformations
 
 # Fonction pour effectuer une rotation de 90 degrés dans le sens des aiguilles d'une montre (clockwise)
 function rotate90_clockwise(mat)
@@ -118,7 +125,7 @@ function run_transformations(game_state, indices, apple_pos)
     inverse_transform = inverse_transformations(applied_transformation)
     # Retourner les résultats
 
-    return "$(canonical_mat)|$(canonical_apple_pos)", inverse_transform #|$(canonical_indices)
+    return "$(canonical_mat)|$(canonical_apple_pos)|$(canonical_indices)", inverse_transform #|$(canonical_indices)
 end
 
 function apply_inverse_transform(inverse_transform::String, direction::Int)
