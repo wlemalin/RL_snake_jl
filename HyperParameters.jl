@@ -43,9 +43,15 @@ function file_name()
         filename = join([EPSILON, ALPHA, GAMMA, APPLE_EATEN, VACANT, HURDLE, INVERSE, CONSTSTEPSIZE], "_")
     end
 
-    return     replace(filename, "." => "f")
+    return replace(filename, "." => "f")
 end
 
 const FILENAME = file_name()
+
+function decode_file(filename::String)::String
+
+end
+
+println(count(x => x == _,FILENAME))
 
 end
