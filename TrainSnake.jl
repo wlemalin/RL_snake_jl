@@ -16,7 +16,7 @@ export EPSILON, ALPHA, GAMMA
 export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
 export UP, RIGHT, DOWN, LEFT
 export APPLE_EATEN, VACANT, HURDLE
-export INVERSE
+export INVERSE, CONSTSTEPSIZE
 
 #Exports from InitGame
 export init_world, init_snake, place_snake!, place_apple!
@@ -40,7 +40,7 @@ export transform_indices, symmetries, run_transformations, apply_inverse_transfo
 export all_transformations_with_indices_and_apple, canonical_form_with_indices_and_apple, inverse_transformations
 
 function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, 
-    current_key, action::Int, reward::Any, next_key, alpha::Bool)
+    current_key, action::Int, reward::Any, next_key)
 
     check_haskey!(q_table, current_key)
     check_haskey!(q_table, next_key)
@@ -48,9 +48,9 @@ function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int
     current_q = q_table[current_key][1][action]
     next_max_q = maximum(q_table[next_key][1])
 
-    if alpha == true
+    if CONSTSTEPSIZE == true
         q_table[current_key][1][action] = current_q + ALPHA * (reward + GAMMA * next_max_q - current_q)
-    elseif alpha == false
+    elseif CONSTSTEPSIZE == false
         q_table[current_key][1][action] = current_q + (1 / (q_table[current_key][2][action] + 1)) * (reward + GAMMA * next_max_q - current_q)
     end
 
@@ -113,7 +113,7 @@ function train_q_learning(episodes::Int; max_steps=300)
                 q_reward = HURDLE
             end
 
-            update_q_table!(q_table, current_key, canonical_action, q_reward, next_key, true)
+            update_q_table!(q_table, current_key, canonical_action, q_reward, next_key)
 
             current_key = next_key
 

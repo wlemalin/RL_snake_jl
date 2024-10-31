@@ -4,7 +4,7 @@ export EPSILON, ALPHA, GAMMA
 export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
 export UP, RIGHT, DOWN, LEFT
 export APPLE_EATEN, VACANT, HURDLE
-export INVERSE
+export INVERSE, CONSTSTEPSIZE, FILENAME
 
 # RL hyperparameters
 const EPSILON = 0.03  
@@ -34,5 +34,13 @@ const HURDLE = -1
 
 #chepa
 const INVERSE = false
+const CONSTSTEPSIZE = false
+
+function file_name()
+    filename = join([EPSILON, ALPHA, GAMMA, APPLE_EATEN, VACANT, HURDLE, INVERSE, CONSTSTEPSIZE], "_")
+    return     replace(filename, "." => "f")
+end
+
+const FILENAME = file_name()
 
 end

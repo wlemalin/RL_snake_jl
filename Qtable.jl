@@ -1,24 +1,27 @@
 module Qtable
 
+include("HyperParameters.jl")
+using .HyperParameters: FILENAME
+
 using Serialization 
 
 export save_q_table, load_q_table
 
-const Q_TABLE_FILE = "snake_q_table.jls"
+const FILE = join(["q_tables", FILENAME], "/") * ".jls"
 
 # Function to save Q-table
 function save_q_table(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}) 
-    open(Q_TABLE_FILE, "w") do io
+    open(FILE, "w") do io
         serialize(io, q_table)
     end
-    println("Q-table saved to $Q_TABLE_FILE")
+    println("Q-table saved to $FILE")
 end
 
 # Function to load Q-table
 function load_q_table()
-    if isfile(Q_TABLE_FILE)
-        q_table = open(deserialize, Q_TABLE_FILE)
-        println("Loaded existing Q-table from $Q_TABLE_FILE")
+    if isfile(FILE)
+        q_table = open(deserialize, FILE)
+        println("Loaded existing Q-table from $FILE")
         return q_table
     else
         println("No existing Q-table found. Starting fresh.")
