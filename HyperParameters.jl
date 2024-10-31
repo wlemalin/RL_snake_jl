@@ -37,7 +37,12 @@ const INVERSE = false
 const CONSTSTEPSIZE = false
 
 function file_name()
-    filename = join([EPSILON, ALPHA, GAMMA, APPLE_EATEN, VACANT, HURDLE, INVERSE, CONSTSTEPSIZE], "_")
+    if CONSTSTEPSIZE == false
+        filename = join([EPSILON, GAMMA, APPLE_EATEN, VACANT, HURDLE, INVERSE, CONSTSTEPSIZE], "_")
+    else
+        filename = join([EPSILON, ALPHA, GAMMA, APPLE_EATEN, VACANT, HURDLE, INVERSE, CONSTSTEPSIZE], "_")
+    end
+
     return     replace(filename, "." => "f")
 end
 
