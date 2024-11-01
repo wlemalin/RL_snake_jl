@@ -4,7 +4,7 @@ export EPSILON, ALPHA, GAMMA
 export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
 export UP, RIGHT, DOWN, LEFT
 export APPLE_EATEN, VACANT, HURDLE
-export INVERSE, CONSTSTEPSIZE, FILENAME
+export INVERSE, CONST_STEP_SIZE, FILENAME
 
 # Hyperparamètres pour l'apprentissage par renforcement
 const EPSILON::Float64 = 0.03
