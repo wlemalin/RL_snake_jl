@@ -81,9 +81,11 @@ function state_to_key(game::StateGame)
 
     vision_str = join(game.vision)
     body_str = join(game.body_relative_pos)
-    key = "$(vision_str)|$(game.apple_relative_pos)"#|$(game.body_relative_pos)
+   
+    key = LARGE_KEY ? "$(vision_str)|$(game.apple_relative_pos)|$(game.body_relative_pos)" :
+                      "$(vision_str)|$(game.apple_relative_pos)"      
 
-    return key, "bite"
+    return key, "nasique"
 end
 
 function check_haskey!(q_table, current_key::String)

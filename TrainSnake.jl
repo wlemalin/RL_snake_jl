@@ -48,9 +48,9 @@ function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int
     current_q = q_table[current_key][1][action]
     next_max_q = maximum(q_table[next_key][1])
 
-    if CONSTSTEPSIZE == true
+    if CONST_STEP_SIZE == true
         q_table[current_key][1][action] = current_q + ALPHA * (reward + GAMMA * next_max_q - current_q)
-    elseif CONSTSTEPSIZE == false
+    elseif CONST_STEP_SIZE == false
         q_table[current_key][1][action] = current_q + (1 / (q_table[current_key][2][action] + 1)) * (reward + GAMMA * next_max_q - current_q)
     end
 

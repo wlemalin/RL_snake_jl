@@ -1,8 +1,8 @@
 module Symmetry
 
-# include("HyperParameters.jl")
+include("HyperParameters.jl")
 
-# using .HyperParameters
+using .HyperParameters
 
 #Exports from Symmetry
 export rotate90_clockwise, diag_symmetry_y_eq_x, rotations, transform_apple_position
@@ -125,7 +125,10 @@ function run_transformations(game_state, indices, apple_pos)
     inverse_transform = inverse_transformations(applied_transformation)
     # Retourner les résultats
 
-    return "$(canonical_mat)|$(canonical_apple_pos)|$(canonical_indices)", inverse_transform #|$(canonical_indices)
+    key = LARGE_KEY ? "$(canonical_mat)|$(canonical_apple_pos)|$(canonical_indices)" :
+                      "$(canonical_mat)|$(canonical_apple_pos)"
+
+    return key, inverse_transform #|$(canonical_indices)
 end
 
 function apply_inverse_transform(inverse_transform::String, direction::Int)

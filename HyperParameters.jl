@@ -4,7 +4,7 @@ export EPSILON, ALPHA, GAMMA
 export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
 export UP, RIGHT, DOWN, LEFT
 export APPLE_EATEN, VACANT, HURDLE
-export INVERSE, CONST_STEP_SIZE, FILENAME
+export INVERSE, CONST_STEP_SIZE, FILENAME, LARGE_KEY
 
 # Hyperparamètres pour l'apprentissage par renforcement
 const EPSILON::Float64 = 0.03
@@ -34,12 +34,14 @@ const HURDLE::Int = -1
 
 # Paramètres supplémentaires
 const INVERSE::Bool = false
-const CONST_STEP_SIZE::Bool = false
+const CONST_STEP_SIZE::Bool = true
+const LARGE_KEY::Bool = false
 
+# Gestion des noms de fichiers 
 function file_name()::String
     params = CONST_STEP_SIZE ? 
-        [EPSILON, ALPHA, GAMMA, APPLE_EATEN, VACANT, HURDLE, INVERSE, CONST_STEP_SIZE] :
-        [EPSILON, GAMMA, APPLE_EATEN, VACANT, HURDLE, INVERSE, CONST_STEP_SIZE]
+        [EPSILON, ALPHA, GAMMA, APPLE_EATEN, VACANT, HURDLE, INVERSE, CONST_STEP_SIZE, LARGE_KEY] :
+        [EPSILON, GAMMA, APPLE_EATEN, VACANT, HURDLE, INVERSE, CONST_STEP_SIZE, LARGE_KEY]
     
     filename = join(params, "_")
     return replace(filename, "." => "f")
@@ -51,20 +53,21 @@ function decode_file(filename::String)::String
     decoded_filename = replace(filename, "f" => ".")   
     params = split(decoded_filename, "_")
     
-    if length(params) == 8
-        epsilon, alpha, gamma, apple_eaten, vacant, hurdle, inverse, const_step_size = params
+    if length(params) == 9
+        epsilon, alpha, gamma, apple_eaten, vacant, hurdle, inverse, const_step_size, large_key = params
         return """
         EPSILON: $epsilon
         ALPHA: $alpha
         GAMMA: $gamma
         APPLE_EATEN: $apple_eaten
         VACANT: $vacant
-        HURDLE: $hurdle
+        HURDLE: $hurdlelarge_key
         INVERSE: $inverse
+        LARGE_KEY: $large_key
         CONST_STEP_SIZE: $const_step_size
         """
-    elseif length(params) == 7
-        epsilon, gamma, apple_eaten, vacant, hurdle, inverse, const_step_size = params
+    elseif length(params) == 8
+        epsilon, gamma, apple_eaten, vacant, hurdle, inverse, const_step_size, large_key = params
         return """
         EPSILON: $epsilon
         GAMMA: $gamma
@@ -72,6 +75,7 @@ function decode_file(filename::String)::String
         VACANT: $vacant
         HURDLE: $hurdle
         INVERSE: $inverse
+        LARGE_KEY: $large_key
         CONST_STEP_SIZE: $const_step_size
         """
     else
