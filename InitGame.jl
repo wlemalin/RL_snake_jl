@@ -9,7 +9,7 @@ export EPSILON, ALPHA, GAMMA
 export EMPTY, APPLE, WALL, SNAKE_BODY, SNAKE_HEAD, PADDING, GRID_SIZE, VIEW_RANGE
 export UP, RIGHT, DOWN, LEFT
 export APPLE_EATEN, VACANT, HURDLE
-export INVERSE, CONST_STEP_SIZE, LARGE_KEY
+export INVERSE, CONST_STEP_SIZE, LARGE_KEY, KICK_HURDLE
 
 #Exports from InitGame
 export init_world, init_snake, place_snake!, place_apple!
