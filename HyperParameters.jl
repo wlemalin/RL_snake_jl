@@ -62,7 +62,7 @@ function decode_file(filename::String)::String
         GAMMA: $gamma
         APPLE_EATEN: $apple_eaten
         VACANT: $vacant
-        HURDLE: $hurdlelarge_key
+        HURDLE: $hurdle
         INVERSE: $inverse
         LARGE_KEY: $large_key
         CONST_STEP_SIZE: $const_step_size
@@ -85,7 +85,7 @@ function decode_file(filename::String)::String
         return "Le format du nom de fichier est invalide."
     end
 end
-#println(decode_file("0f03_0f02_0f825_1f0_0f0_-1f0_0f0_1f0"))
+#println(decode_file("0f03_0f04_0f825_1f0_0f0_-1f0_0f0_1f0_0f0_1f0"))
 end
 
 
