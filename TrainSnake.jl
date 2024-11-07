@@ -49,7 +49,7 @@ function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int
     next_max_q = maximum(q_table[next_key][1])
 
     if reward == HURDLE && KICK_HURDLE
-        q_table[current_key][1][action] = -1000
+        q_table[current_key][1][action] = - abs(HURDLE * 10)
     else
         q_table[current_key][1][action] = CONST_STEP_SIZE ? 
             (current_q + ALPHA * (reward + GAMMA * next_max_q - current_q)) :
@@ -59,12 +59,21 @@ function update_q_table!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int
     q_table[current_key][2][action] += 1
 end
 
+function check_hurdle(q_values::Vector{Float64})
+    accepted_indice = findall(x -> x > HURDLE, q_values)
+    if isempty(accepted_indice)
+        return rand(1:4)
+    else
+        return rand(accepted_indice)
+    end 
+end
+
 function egreedy(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}, current_key::String, inverse_transform::String)
     check_haskey!(q_table, current_key)
     q_values = q_table[current_key][1]
 
     if rand() < EPSILON 
-        canonical_action = rand(1:4)
+        canonical_action = KICK_HURDLE ? check_hurdle(q_values) : rand(1:4)
     else
         canonical_action = argmax(q_values)
     end

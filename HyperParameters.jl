@@ -8,7 +8,7 @@ export INVERSE, CONST_STEP_SIZE, FILENAME, LARGE_KEY, KICK_HURDLE
 
 # Hyperparamètres pour l'apprentissage par renforcement
 const EPSILON::Float64 = 0.03
-const ALPHA::Float64 = 0.04 
+const ALPHA::Float64 = 0.04
 const GAMMA::Float64 = 0.825
 
 # Paramètres du jeu
