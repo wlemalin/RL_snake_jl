@@ -8,7 +8,7 @@ export INVERSE, CONST_STEP_SIZE, FILENAME, LARGE_KEY, KICK_HURDLE
 
 # Hyperparamètres pour l'apprentissage par renforcement
 const EPSILON::Float64 = 0.03
-const ALPHA::Float64 = 0.9
+const ALPHA::Float64 = 0.1
 const GAMMA::Float64 = 0.825
 
 # Paramètres du jeu
@@ -34,9 +34,9 @@ const HURDLE::Int = -1
 
 # Paramètres supplémentaires
 const INVERSE::Bool = false
-const CONST_STEP_SIZE::Bool = true
+const CONST_STEP_SIZE::Bool = false
 const LARGE_KEY::Bool = false
-const KICK_HURDLE::Bool = true
+const KICK_HURDLE::Bool = false
 
 # Gestion des noms de fichiers 
 function file_name()::String
