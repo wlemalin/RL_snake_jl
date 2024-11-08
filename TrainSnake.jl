@@ -95,7 +95,7 @@ end
 #     return action, canonical_action
 # end
 
-function train_q_learning(episodes::Int; max_steps=300)
+function train_q_learning(episodes::Int; max_steps=500)
 
     q_table = load_q_table()
     
