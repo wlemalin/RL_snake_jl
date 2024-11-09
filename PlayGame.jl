@@ -121,7 +121,7 @@ function print_world(game::StateGame)
     end
 end
 
-function play_trained_game!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}; max_steps=200)
+function play_trained_game!(q_table::Dict{String, Tuple{Vector{Float64}, Vector{Int}}}; max_steps=1000)
     game = init_game()
     total_score = 0
 
