@@ -1,6 +1,3 @@
-Voici une version complète et révisée du fichier README pour ton projet Snake en Julia avec Q-learning :
-
----
 
 # Snake Q-Learning en Julia
 
