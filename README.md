@@ -10,8 +10,6 @@ Ce projet implémente une version autonome du jeu Snake, contrôlée par un agen
 3. [Installation](#installation)
 4. [Structure du Projet](#structure-du-projet)
 5. [Utilisation](#utilisation)
-6. [Fonctionnalités](#fonctionnalités)
-7. [Contributeurs](#contributeurs)
 
 ---
 
